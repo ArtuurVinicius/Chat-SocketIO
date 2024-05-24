@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <input type="text" />
+    <button onclick="enviar()">Enviar</button>
+    <ul></ul>
+  </body>
+
+  <script>
+    const skt = new WebSocket(
+      "wss://ad328121-5f5f-4d03-8432-fcf145175e34-00-3q9aeyoudy1k8.worf.replit.dev/",
+    );
+
+    skt.addEventListener("message", async (event) => {
+      // console.log("chegou a msg ", await event.data.text());
+      message = await event.data.text();
+      const ul = document.querySelector("ul");
+      ul.innerHTML += `<li>${message}</li>`;
+    });
+
+    function enviar() {
+      let msg = document.querySelector("input");
+      skt.send(msg.value);
+      msg.value = "";
+    }
+  </script>
+</html>
