@@ -97,9 +97,11 @@
     });
 
     function enviar() {
-      let msg = document.querySelector("#messageInput").value;
-      socket.emit("message", msg);
-      document.querySelector("#messageInput").value = "";
+      let msg = document.querySelector("#messageInput").value.trim();
+      if (msg !== "") {
+        socket.emit("message", msg);
+        document.querySelector("#messageInput").value = "";
+      }
     }
 
     document.querySelector("#messageInput").addEventListener("keydown", (event) => {
