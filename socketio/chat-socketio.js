@@ -7,10 +7,8 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
 
-// Configurar middleware para processar dados de formulários
 app.use(express.urlencoded({ extended: true }));
 
-// Configurar middleware para sessões
 app.use(session({
   secret: 'secreto',
   resave: false,

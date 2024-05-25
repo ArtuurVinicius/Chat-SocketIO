@@ -108,7 +108,7 @@
 
       socket.on("connect", () => {
         console.log("Conectado ao servidor");
-        // Receber nome de usuário da sessão
+
         fetch('/session-username')
           .then(response => response.json())
           .then(data => {
