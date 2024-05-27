@@ -22,7 +22,7 @@ io.on("connection", socket => {
 
   socket.on("username", username => {
     users[socket.id] = username;
-    socket.broadcast.emit("message", `${username} entrou no chat`)
+    socket.broadcast.emit("message", `"${username}" entrou no chat`)
   });
 
   socket.on("message", msg => {
