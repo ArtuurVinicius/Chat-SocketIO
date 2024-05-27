@@ -103,15 +103,17 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.js"></script>
     <script>
-      const socket = io("https://ad328121-5f5f-4d03-8432-fcf145175e34-00-3q9aeyoudy1k8.worf.replit.dev/");
-      let username = '';
+      const socket = io(
+        "https://ad328121-5f5f-4d03-8432-fcf145175e34-00-3q9aeyoudy1k8.worf.replit.dev/",
+      );
+      let username = "";
 
       socket.on("connect", () => {
         console.log("Conectado ao servidor");
 
-        fetch('/session-username')
-          .then(response => response.json())
-          .then(data => {
+        fetch("/session-username")
+          .then((response) => response.json())
+          .then((data) => {
             username = data.username;
             socket.emit("username", username);
           });
@@ -125,7 +127,7 @@
           messageClass = "sent-message";
         }
         ul.innerHTML += `<li class="${messageClass}">${msg}</li>`;
-        ul.scrollTop = ul.scrollHeight;
+        scrollToBottom();
       });
 
       function enviar() {
@@ -133,14 +135,22 @@
         if (msg !== "") {
           socket.emit("message", msg);
           document.querySelector("#messageInput").value = "";
+          scrollToBottom();
         }
       }
 
-      document.querySelector("#messageInput").addEventListener("keydown", (event) => {
-        if (event.key === "Enter") {
-          enviar();
-        }
-      });
+      function scrollToBottom() {
+        const messagesContainer = document.querySelector(".messages");
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+      }
+
+      document
+        .querySelector("#messageInput")
+        .addEventListener("keydown", (event) => {
+          if (event.key === "Enter") {
+            enviar();
+          }
+        });
     </script>
   </body>
 </html>
