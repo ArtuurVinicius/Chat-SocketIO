@@ -2,7 +2,6 @@
 <html>
   <head>
     <title>Chat</title>
-    <link rel="stylesheet" href="./chat.css" />
   </head>
   <body>
     <div class="chat-container">
@@ -128,6 +127,23 @@
         }
         ul.innerHTML += `<li class="${messageClass}">${msg}</li>`;
         scrollToBottom();
+      });
+
+      socket.on("play-audio", (keyword) => {
+        let audioFile;
+        if (keyword === 'auuuuu') {
+          audioFile = '/sounds/au.mp3';
+        } else if (keyword === 'atumalaca') {
+          audioFile = '/sounds/atumalaca.mp3'; 
+        } else if (keyword === 'cash') {
+          audioFile = '/sounds/cash.mp3';
+        } else if (keyword === 'tome'){
+          audioFile = '/sounds/tome.mp3';
+        }
+        if (audioFile) {
+          const audio = new Audio(audioFile);
+          audio.play();
+        }
       });
 
       function enviar() {
