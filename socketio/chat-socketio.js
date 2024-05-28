@@ -16,6 +16,8 @@ app.use(session({
   saveUninitialized: true
 }));
 
+app.use('/css', express.static(path.join(__dirname, 'css')));
+
 const users = {};
 
 io.on("connection", socket => {

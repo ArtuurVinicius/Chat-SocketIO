@@ -2,103 +2,19 @@
 <html>
   <head>
     <title>Chat</title>
+    <link rel="stylesheet" href="/css/chat.css" />
   </head>
+
   <body>
     <div class="chat-container">
       <div class="messages">
         <ul></ul>
       </div>
       <div class="input-container">
-        <input
-          type="text"
-          id="messageInput"
-          placeholder="Digite sua mensagem..."
-        />
+        <input type="text" id="messageInput" placeholder="Digite sua mensagem..."/>
         <button onclick="enviar()">Enviar</button>
       </div>
     </div>
-
-    <style>
-      body {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        background-color: #f0f0f0;
-        margin: 0;
-        font-family: Arial, sans-serif;
-      }
-
-      .chat-container {
-        display: flex;
-        flex-direction: column;
-        width: 90%;
-        max-width: 600px;
-        height: 90%;
-        max-height: 600px;
-        background-color: white;
-        border-radius: 8px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        overflow: hidden;
-      }
-
-      .messages {
-        flex: 1;
-        padding: 10px;
-        overflow-y: auto;
-        border-bottom: 1px solid #ddd;
-      }
-
-      .messages ul {
-        list-style: none;
-        padding: 0;
-      }
-
-      .messages li {
-        padding: 8px 12px;
-        margin-bottom: 10px;
-        border-radius: 4px;
-        background-color: #f1f1f1;
-        word-wrap: break-word;
-      }
-
-      .messages li:nth-child(odd) {
-        background-color: #e1f5fe;
-      }
-
-      .input-container {
-        display: flex;
-        padding: 10px;
-        border-top: 1px solid #ddd;
-      }
-
-      .input-container input {
-        flex: 1;
-        padding: 10px;
-        border: 1px solid #ddd;
-        border-radius: 4px;
-        outline: none;
-      }
-
-      .input-container button {
-        margin-left: 10px;
-        padding: 10px 20px;
-        border: none;
-        background-color: #007bff;
-        color: white;
-        border-radius: 4px;
-        cursor: pointer;
-      }
-
-      .input-container button:hover {
-        background-color: #0056b3;
-      }
-
-      .sent-message {
-        text-align: right;
-        background-color: #d1ffd1;
-      }
-    </style>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.js"></script>
     <script>
@@ -131,14 +47,14 @@
 
       socket.on("play-audio", (keyword) => {
         let audioFile;
-        if (keyword === 'auuuuu') {
-          audioFile = '/sounds/au.mp3';
-        } else if (keyword === 'atumalaca') {
-          audioFile = '/sounds/atumalaca.mp3'; 
-        } else if (keyword === 'cash') {
-          audioFile = '/sounds/cash.mp3';
-        } else if (keyword === 'tome'){
-          audioFile = '/sounds/tome.mp3';
+        if (keyword === "auuuuu") {
+          audioFile = "/sounds/au.mp3";
+        } else if (keyword === "atumalaca") {
+          audioFile = "/sounds/atumalaca.mp3";
+        } else if (keyword === "cash") {
+          audioFile = "/sounds/cash.mp3";
+        } else if (keyword === "tome") {
+          audioFile = "/sounds/tome.mp3";
         }
         if (audioFile) {
           const audio = new Audio(audioFile);
@@ -160,9 +76,7 @@
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
       }
 
-      document
-        .querySelector("#messageInput")
-        .addEventListener("keydown", (event) => {
+      document.querySelector("#messageInput").addEventListener("keydown", (event) => {
           if (event.key === "Enter") {
             enviar();
           }
