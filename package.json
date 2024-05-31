@@ -4,7 +4,6 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "wbs": "nodemon ./websocket/chat-websocket.js",
     "io": "nodemon ./socketio/chat-socketio.js"
   },
   "keywords": [],
