@@ -8,6 +8,8 @@ const app = express();
 const server = http.createServer(app);
 const io = socketIo(server);
 
+const API = "https://a621d81c-110b-47d4-a0a0-109c9de72737-00-2e87akalqv5ld.spock.replit.dev";
+
 app.use(express.urlencoded({ extended: true }));
 
 app.use(session({
@@ -41,6 +43,34 @@ io.on("connection", socket => {
       io.emit("play-audio", 'atumalaca');
     } else if(lowerMsg.includes("tome")) {
       io.emit("play-audio", 'tome');
+    } else if (lowerMsg.includes(`img cat`)){
+      fetch(`${API}/gato`)
+        .then(res => res.json())
+        .then(data => {
+           io.emit("message", `${users[socket.id]}: <img src="${data}" width="300" height="300">`);
+        });
+    } else if(lowerMsg.includes(`img dog`)){
+      fetch(`${API}/dog`)
+      .then(res => res.json())
+      .then(data => {
+         io.emit("message", `${users[socket.id]}: <img src="${data}" width="300" height="300">`);
+      });
+      
+    } else if (lowerMsg.startsWith("mtg ")) {
+      const cardname = msg.slice(4).trim();
+      fetch(`${API}/mtg?cardname=${encodeURIComponent(cardname)}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data) {
+            io.emit("message", `${users[socket.id]}: <img src="${data}" width="300" height="420">`);
+          } else {
+            io.emit("message", `${users[socket.id]}: Card not found`);
+          }
+        })
+        .catch(error => {
+          console.error('Error fetching the card image:', error);
+          io.emit("message", `${users[socket.id]}: Error fetching the card image`);
+        });
     }
   });
 });
