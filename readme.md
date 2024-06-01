@@ -9,6 +9,6 @@
 # ENTREGAS DA SEMANA 2
 - Ajuste para que quando tiver muitas mensagens o chat fazer o scroll das mensagens para baixo, ou seja, rola a tela para o fim - OK
 - Implemente a execução de 3 sons (pode ser de animais) para quando digitar a chamada (nome do animal ou som) na tela do chat o som em questão ser executado. - OK
-- Adicione 3 das APIs públicas listadas abaixo. Exemplo, quando eu digitar imagem gato, ele me envia uma imagem de um gato, mas tem outras inúmeras APIs. Essas APIs devem ser integradas em uma aplicação EXCLUSIVA para servir rotas para as três APIS que estarão implementas nessa nova aplicação. Podem usar o expressjs.
+- Adicione 3 das APIs públicas listadas abaixo. Exemplo, quando eu digitar imagem gato, ele me envia uma imagem de um gato, mas tem outras inúmeras APIs. Essas APIs devem ser integradas em uma aplicação EXCLUSIVA para servir rotas para as três APIS que estarão implementas nessa nova aplicação. Podem usar o expressjs. - OK
 - Adicione o web service do VIA para consultar cep pelo número e pela rua. Você deve criar uma aplicação que irá mascarar essas chamadas numa nova aplicação. Podem usar o expressjs.
 - Implemente um CRUD para pessoas com a documentação do Swagger com os seguintes campos: Nome, Idade, CPF, Email e Sexo. Essa aplicação deve está em uma novo projeto para ser chamado no chat como uma API.
