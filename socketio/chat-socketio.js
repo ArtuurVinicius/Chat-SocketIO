@@ -168,15 +168,12 @@ io.on("connection", (socket) => {
           console.error("Erro ao buscar pessoas:", error);
           io.emit("message", `${users[socket.id]}: Erro ao buscar pessoas.`);
         });
-      
     } else if (lowerMsg.startsWith("get pessoa ")) {
       const id = lowerMsg.split(" ")[2];
       console.log("id pessoa:", id);
       fetch(`${CRUD}/${id}`)
         .then((res) => {
-          if (!res.ok) {
-            throw new Error("Erro ao buscar pessoa");
-          }
+          console.log(res)
           return res.json();
         })
         .then((data) => {
@@ -189,56 +186,23 @@ io.on("connection", (socket) => {
         });
     } else if (lowerMsg.startsWith("post pessoa ")) {
       const parts = msg.slice(12).trim().split(",");
-      console.log("Partes da mensagem recebida:", parts); // Log para verificar as partes da mensagem
-
       if (parts.length === 5) {
-        const [nome, idade, cpf, email, sexo] = parts.map((p) => p.trim());
-        console.log("Nome:", nome); // Log para verificar o valor de nome
-        console.log("Idade:", idade); // Log para verificar o valor de idade
-        console.log("CPF:", cpf); // Log para verificar o valor de cpf
-        console.log("Email:", email); // Log para verificar o valor de email
-        console.log("Sexo:", sexo); // Log para verificar o valor de sexo
-
-        const pessoa = {
-          nome,
-          idade: Number(idade), // Certifique-se de que idade é um número
-          cpf,
-          email,
-          sexo,
-        };
-
+        const [nome, idade, cpf, email, sexo] = parts.map(p => p.trim());
         fetch(CRUD, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(pessoa),
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ nome, idade, cpf, email, sexo })
         })
-          .then((res) => {
-            return res.json(); // Obter a resposta como texto
-          })
-          .then((data) => {
-            try {
-              const data = JSON.parse(text); // Tentar converter a resposta para JSON
-              io.emit(
-                "message",
-                `${users[socket.id]}: Pessoa criada com sucesso! ID: ${data.id}`,
-              );
-            } catch (error) {
-              console.error("Erro ao analisar JSON:", error);
-              io.emit(
-                "message",
-                `${users[socket.id]}: Erro ao criar pessoa. Resposta não é JSON válido.`,
-              );
-            }
-          })
-          .catch((error) => {
-            console.error("Erro ao criar pessoa:", error);
-            io.emit("message", `${users[socket.id]}: Erro ao criar pessoa.`);
-          });
+        .then((res) => res.json())
+        .then((data) => {
+          io.emit("message", `${users[socket.id]}: Pessoa criada com sucesso! ID: ${data.id}`);
+        })
+        .catch((error) => {
+          console.error("Erro ao criar pessoa:", error);
+          io.emit("message", `${users[socket.id]}: Erro ao criar pessoa.`);
+        });
       } else {
-        io.emit(
-          "message",
-          `${users[socket.id]}: Formato inválido. Use: post pessoa nome, idade, cpf, email, sexo.`,
-        );
+        io.emit("message", `${users[socket.id]}: Formato inválido. Use: post pessoa nome, idade, cpf, email, sexo.`);
       }
     } else if (lowerMsg.startsWith("patch pessoa ")) {
       const parts = msg.slice(13).trim().split(",");
@@ -247,7 +211,7 @@ io.on("connection", (socket) => {
         const [nome, idade, cpf, email, sexo] = parts
           .slice(1)
           .map((p) => p.trim());
-        fetch(`${jsonServerUrl}/${id}`, {
+        fetch(`${CRUD}/${id}`, {
           method: "PATCH",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ nome, idade, cpf, email, sexo }),
