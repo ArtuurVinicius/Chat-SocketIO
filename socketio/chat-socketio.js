@@ -13,6 +13,9 @@ const API =
 const viacep =
   "https://feb2862c-c88d-43fa-8c57-baca91a6c4c5-00-aheq4dqze7hl.picard.replit.dev/";
 
+const CRUD =
+  "https://c43f2d09-4ca1-4257-a8cb-5e6d97411bb8-00-2ir59x0jujtgu.kirk.replit.dev/api/pessoas";
+
 app.use(express.urlencoded({ extended: true }));
 
 app.use(
@@ -114,26 +117,178 @@ io.on("connection", (socket) => {
       const parts = msg.slice(4).trim().split(" ");
       if (parts.length >= 3) {
         const uf = parts[0];
-        const cidade = parts.slice(1, parts.length - 1).join(" ");  // Junta todas as partes exceto a última como cidade
-        const rua = parts[parts.length - 1];  // Última parte como rua
-        fetch(`${viacep}/rua/${uf}/${encodeURIComponent(cidade)}/${encodeURIComponent(rua)}`)
+        const cidade = parts.slice(1, parts.length - 1).join(" "); // Junta todas as partes exceto a última como cidade
+        const rua = parts[parts.length - 1]; // Última parte como rua
+        fetch(
+          `${viacep}/rua/${uf}/${encodeURIComponent(cidade)}/${encodeURIComponent(rua)}`,
+        )
           .then((res) => res.json())
           .then((data) => {
             if (data && data.length > 0) {
-              
-              const endereco = data.map(end =>`\n<p> ${end.cep}, ${end.logradouro}, ${end.bairro}, ${end.localidade} - ${end.uf}\n<p>`).join("\n");
+              const endereco = data
+                .map(
+                  (end) =>
+                    `\n<p> ${end.cep}, ${end.logradouro}, ${end.bairro}, ${end.localidade} - ${end.uf}\n<p>`,
+                )
+                .join("\n");
               io.emit("message", `${users[socket.id]}: ${endereco}`);
             } else {
-              io.emit("message", `${users[socket.id]}: Endereço não encontrado.`);
+              io.emit(
+                "message",
+                `${users[socket.id]}: Endereço não encontrado.`,
+              );
             }
           })
           .catch((error) => {
             console.error("Erro ao consultar endereço:", error);
-            io.emit("message", `${users[socket.id]}: Erro ao consultar endereço.`);
+            io.emit(
+              "message",
+              `${users[socket.id]}: Erro ao consultar endereço.`,
+            );
           });
       } else {
-        io.emit("message", `${users[socket.id]}: Formato inválido. Use: rua UF cidade rua.`);
+        io.emit(
+          "message",
+          `${users[socket.id]}: Formato inválido. Use: rua UF cidade rua.`,
+        );
       }
+    } else if (lowerMsg.startsWith("get pessoas")) {
+      fetch(CRUD)
+        .then((res) => res.json())
+        .then((data) => {
+          const pessoas = data
+            .map(
+              (p) =>
+                `<p>ID: ${p.id}, Nome: ${p.nome}, Idade: ${p.idade}, CPF: ${p.cpf}, Email: ${p.email}, Sexo: ${p.sexo}</p>`,
+            )
+            .join("\n");
+          io.emit("message", `${users[socket.id]}: ${pessoas}`);
+        })
+        .catch((error) => {
+          console.error("Erro ao buscar pessoas:", error);
+          io.emit("message", `${users[socket.id]}: Erro ao buscar pessoas.`);
+        });
+      
+    } else if (lowerMsg.startsWith("get pessoa ")) {
+      const id = lowerMsg.split(" ")[2];
+      console.log("id pessoa:", id);
+      fetch(`${CRUD}/${id}`)
+        .then((res) => {
+          if (!res.ok) {
+            throw new Error("Erro ao buscar pessoa");
+          }
+          return res.json();
+        })
+        .then((data) => {
+          const pessoa = `<p>ID: ${data.id}, Nome: ${data.nome}, Idade: ${data.idade}, CPF: ${data.cpf}, Email: ${data.email}, Sexo: ${data.sexo}</p>`;
+          io.emit("message", `${users[socket.id]}: ${pessoa}`);
+        })
+        .catch((error) => {
+          console.error("Erro ao buscar pessoa:", error);
+          io.emit("message", `${users[socket.id]}: Erro ao buscar pessoa.`);
+        });
+    } else if (lowerMsg.startsWith("post pessoa ")) {
+      const parts = msg.slice(12).trim().split(",");
+      console.log("Partes da mensagem recebida:", parts); // Log para verificar as partes da mensagem
+
+      if (parts.length === 5) {
+        const [nome, idade, cpf, email, sexo] = parts.map((p) => p.trim());
+        console.log("Nome:", nome); // Log para verificar o valor de nome
+        console.log("Idade:", idade); // Log para verificar o valor de idade
+        console.log("CPF:", cpf); // Log para verificar o valor de cpf
+        console.log("Email:", email); // Log para verificar o valor de email
+        console.log("Sexo:", sexo); // Log para verificar o valor de sexo
+
+        const pessoa = {
+          nome,
+          idade: Number(idade), // Certifique-se de que idade é um número
+          cpf,
+          email,
+          sexo,
+        };
+
+        fetch(CRUD, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(pessoa),
+        })
+          .then((res) => {
+            return res.json(); // Obter a resposta como texto
+          })
+          .then((data) => {
+            try {
+              const data = JSON.parse(text); // Tentar converter a resposta para JSON
+              io.emit(
+                "message",
+                `${users[socket.id]}: Pessoa criada com sucesso! ID: ${data.id}`,
+              );
+            } catch (error) {
+              console.error("Erro ao analisar JSON:", error);
+              io.emit(
+                "message",
+                `${users[socket.id]}: Erro ao criar pessoa. Resposta não é JSON válido.`,
+              );
+            }
+          })
+          .catch((error) => {
+            console.error("Erro ao criar pessoa:", error);
+            io.emit("message", `${users[socket.id]}: Erro ao criar pessoa.`);
+          });
+      } else {
+        io.emit(
+          "message",
+          `${users[socket.id]}: Formato inválido. Use: post pessoa nome, idade, cpf, email, sexo.`,
+        );
+      }
+    } else if (lowerMsg.startsWith("patch pessoa ")) {
+      const parts = msg.slice(13).trim().split(",");
+      if (parts.length === 6) {
+        const id = parts[0].trim();
+        const [nome, idade, cpf, email, sexo] = parts
+          .slice(1)
+          .map((p) => p.trim());
+        fetch(`${jsonServerUrl}/${id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ nome, idade, cpf, email, sexo }),
+        })
+          .then(() => {
+            io.emit(
+              "message",
+              `${users[socket.id]}: Pessoa atualizada com sucesso!`,
+            );
+          })
+          .catch((error) => {
+            console.error("Erro ao atualizar pessoa:", error);
+            io.emit(
+              "message",
+              `${users[socket.id]}: Erro ao atualizar pessoa.`,
+            );
+          });
+      } else {
+        io.emit(
+          "message",
+          `${users[socket.id]}: Formato inválido. Use: patch pessoa id, nome, idade, cpf, email, sexo.`,
+        );
+      }
+    } else if (lowerMsg.startsWith("delete pessoa ")) {
+      const id = lowerMsg.split(" ")[2];
+      fetch(`${CRUD}/${id}`, {
+        method: "DELETE",
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          io.emit(
+            "message",
+            `${users[socket.id]}: Pessoa deletada com sucesso!`,
+          );
+        })
+        .catch((error) => {
+          console.error("Erro ao deletar pessoa:", error);
+          io.emit("message", `${users[socket.id]}: Erro ao deletar pessoa.`);
+        });
+    } else {
+      io.emit("message", `${users[socket.id]}: Comando não reconhecido.`);
     }
   });
 });
