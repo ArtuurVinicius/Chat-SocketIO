@@ -9,12 +9,11 @@ const server = http.createServer(app);
 const io = socketIo(server);
 
 const API =
-  "https://a621d81c-110b-47d4-a0a0-109c9de72737-00-2e87akalqv5ld.spock.replit.dev";
+  "https://a621d81c-110b-47d4-a0a0-109c9de72737-00-2e87akalqv5ld.spock.replit.dev"
 const viacep =
-  "https://feb2862c-c88d-43fa-8c57-baca91a6c4c5-00-aheq4dqze7hl.picard.replit.dev/";
-
+  "https://feb2862c-c88d-43fa-8c57-baca91a6c4c5-00-aheq4dqze7hl.picard.replit.dev/"
 const CRUD =
-  "https://c43f2d09-4ca1-4257-a8cb-5e6d97411bb8-00-2ir59x0jujtgu.kirk.replit.dev/api/pessoas";
+  "https://c43f2d09-4ca1-4257-a8cb-5e6d97411bb8-00-2ir59x0jujtgu.kirk.replit.dev/api/pessoas"
 
 app.use(express.urlencoded({ extended: true }));
 
@@ -93,10 +92,10 @@ io.on("connection", (socket) => {
     } else if (lowerMsg.startsWith("cep ")) {
       const cep = msg.slice(4).trim();
       fetch(`${viacep}/cep/${cep}`)
-        .then((res) => res.text()) // Use text() para inspecionar a resposta bruta
+        .then((res) => res.text())
         .then((text) => {
           try {
-            const data = JSON.parse(text); // Tente parsear o texto como JSON
+            const data = JSON.parse(text); 
             if (data && data.logradouro) {
               const endereco = `${data.logradouro}, ${data.bairro}, ${data.localidade} - ${data.uf}`;
               io.emit("message", `${users[socket.id]}: ${endereco}`);
@@ -105,7 +104,7 @@ io.on("connection", (socket) => {
             }
           } catch (error) {
             console.error("Erro ao consultar CEP:", error);
-            console.error("Resposta recebida:", text); // Log da resposta bruta
+            console.error("Resposta recebida:", text);
             io.emit("message", `${users[socket.id]}: Erro ao consultar CEP.`);
           }
         })
@@ -117,8 +116,8 @@ io.on("connection", (socket) => {
       const parts = msg.slice(4).trim().split(" ");
       if (parts.length >= 3) {
         const uf = parts[0];
-        const cidade = parts.slice(1, parts.length - 1).join(" "); // Junta todas as partes exceto a última como cidade
-        const rua = parts[parts.length - 1]; // Última parte como rua
+        const cidade = parts.slice(1, parts.length - 1).join(" "); 
+        const rua = parts[parts.length - 1]; 
         fetch(
           `${viacep}/rua/${uf}/${encodeURIComponent(cidade)}/${encodeURIComponent(rua)}`,
         )
@@ -172,10 +171,7 @@ io.on("connection", (socket) => {
       const id = lowerMsg.split(" ")[2];
       console.log("id pessoa:", id);
       fetch(`${CRUD}/${id}`)
-        .then((res) => {
-          console.log(res)
-          return res.json();
-        })
+        .then((res) => res.json())
         .then((data) => {
           const pessoa = `<p>ID: ${data.id}, Nome: ${data.nome}, Idade: ${data.idade}, CPF: ${data.cpf}, Email: ${data.email}, Sexo: ${data.sexo}</p>`;
           io.emit("message", `${users[socket.id]}: ${pessoa}`);
@@ -187,22 +183,28 @@ io.on("connection", (socket) => {
     } else if (lowerMsg.startsWith("post pessoa ")) {
       const parts = msg.slice(12).trim().split(",");
       if (parts.length === 5) {
-        const [nome, idade, cpf, email, sexo] = parts.map(p => p.trim());
+        const [nome, idade, cpf, email, sexo] = parts.map((p) => p.trim());
         fetch(CRUD, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ nome, idade, cpf, email, sexo })
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ nome, idade, cpf, email, sexo }),
         })
-        .then((res) => res.json())
-        .then((data) => {
-          io.emit("message", `${users[socket.id]}: Pessoa criada com sucesso! ID: ${data.id}`);
-        })
-        .catch((error) => {
-          console.error("Erro ao criar pessoa:", error);
-          io.emit("message", `${users[socket.id]}: Erro ao criar pessoa.`);
-        });
+          .then((res) => res.json())
+          .then((data) => {
+            io.emit(
+              "message",
+              `${users[socket.id]}: Pessoa criada com sucesso! ID: ${data.id}`,
+            );
+          })
+          .catch((error) => {
+            console.error("Erro ao criar pessoa:", error);
+            io.emit("message", `${users[socket.id]}: Erro ao criar pessoa.`);
+          });
       } else {
-        io.emit("message", `${users[socket.id]}: Formato inválido. Use: post pessoa nome, idade, cpf, email, sexo.`);
+        io.emit(
+          "message",
+          `${users[socket.id]}: Formato inválido. Use: post pessoa nome, idade, cpf, email, sexo.`,
+        );
       }
     } else if (lowerMsg.startsWith("patch pessoa ")) {
       const parts = msg.slice(13).trim().split(",");
@@ -250,6 +252,26 @@ io.on("connection", (socket) => {
         .catch((error) => {
           console.error("Erro ao deletar pessoa:", error);
           io.emit("message", `${users[socket.id]}: Erro ao deletar pessoa.`);
+        });
+    } else if (lowerMsg.startsWith("chatgpt ")) {
+      const prompt = msg.slice(8).trim();
+      fetch("https://69a9d945-11ca-4394-a519-7873177de5ff-00-25jvbrl87p7y1.janeway.replit.dev:3000/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ prompt }),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          io.emit("message", `gepeto: ${data.response}`);
+        })
+        .catch((error) => {
+          console.error("Erro ao comunicar com a API de ChatGPT:", error);
+          io.emit(
+            "message",
+            `${users[socket.id]}: Erro ao comunicar com a API de ChatGPT.`,
+          );
         });
     } else {
       io.emit("message", `${users[socket.id]}: Comando não reconhecido.`);

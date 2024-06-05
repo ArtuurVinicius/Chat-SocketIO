@@ -18,9 +18,7 @@
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.5/socket.io.js"></script>
     <script>
-      const socket = io(
-        "https://ad328121-5f5f-4d03-8432-fcf145175e34-00-3q9aeyoudy1k8.worf.replit.dev/",
-      );
+      const socket = io("https://ad328121-5f5f-4d03-8432-fcf145175e34-00-3q9aeyoudy1k8.worf.replit.dev/");
       let username = "";
 
       socket.on("connect", () => {
@@ -38,7 +36,10 @@
         console.log(msg);
         const ul = document.querySelector(".messages ul");
         let messageClass = "";
-        if (msg.startsWith(`${username}:`)) {
+        
+        if (msg.startsWith("chatgpt:")) {
+          messageClass = "chatgpt-message";
+        } else if (msg.startsWith(`${username}:`)) {
           messageClass = "sent-message";
         }
         ul.innerHTML += `<li class="${messageClass}">${msg}</li>`;
@@ -77,10 +78,10 @@
       }
 
       document.querySelector("#messageInput").addEventListener("keydown", (event) => {
-          if (event.key === "Enter") {
-            enviar();
-          }
-        });
+        if (event.key === "Enter") {
+          enviar();
+        }
+      });
     </script>
   </body>
 </html>
