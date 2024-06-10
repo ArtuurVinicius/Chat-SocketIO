@@ -14,6 +14,7 @@ const viacep =
   "https://feb2862c-c88d-43fa-8c57-baca91a6c4c5-00-aheq4dqze7hl.picard.replit.dev/"
 const CRUD =
   "https://c43f2d09-4ca1-4257-a8cb-5e6d97411bb8-00-2ir59x0jujtgu.kirk.replit.dev/api/pessoas"
+const urlOpenAI = "https://69a9d945-11ca-4394-a519-7873177de5ff-00-25jvbrl87p7y1.janeway.replit.dev:3000"
 
 app.use(express.urlencoded({ extended: true }));
 
@@ -255,7 +256,7 @@ io.on("connection", (socket) => {
         });
     } else if (lowerMsg.startsWith("chatgpt ")) {
       const prompt = msg.slice(8).trim();
-      fetch("https://69a9d945-11ca-4394-a519-7873177de5ff-00-25jvbrl87p7y1.janeway.replit.dev:3000/chat", {
+      fetch(`${urlOpenAI}/chat`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -273,9 +274,36 @@ io.on("connection", (socket) => {
             `${users[socket.id]}: Erro ao comunicar com a API de ChatGPT.`,
           );
         });
-    } else {
-      io.emit("message", `${users[socket.id]}: Comando não reconhecido.`);
+    } else if (lowerMsg.startsWith("dalle ")) {
+        const prompt = msg.slice(6).trim();
+        console.log("prompt: " + prompt);
+        fetch(`${urlOpenAI}/gptImage`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ prompt }),
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            console.log("data: ", data);
+            
+            io.emit("message", `${users[socket.id]}: <img src="${data.imageUrl}" width="300" height="300">`);
+          })
+          .catch((error) => {
+            console.error("Erro ao comunicar com a API de ChatGPT:", error);
+            io.emit(
+              "message",
+              `${users[socket.id]}: Erro ao comunicar com a API de ChatGPT.`
+            );
+          });
+          
+
     }
+    else {
+      io.emit("message", `${users[socket.id]}: Comando não reconhecido.`);
+    } 
+    
   });
 });
 
