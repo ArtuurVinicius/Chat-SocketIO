@@ -297,12 +297,7 @@ io.on("connection", (socket) => {
               `${users[socket.id]}: Erro ao comunicar com a API de ChatGPT.`
             );
           });
-          
-
     }
-    else {
-      io.emit("message", `${users[socket.id]}: Comando não reconhecido.`);
-    } 
     
   });
 });
