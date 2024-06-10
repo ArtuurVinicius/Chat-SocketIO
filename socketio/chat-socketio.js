@@ -9,12 +9,13 @@ const server = http.createServer(app);
 const io = socketIo(server);
 
 const API =
-  "https://a621d81c-110b-47d4-a0a0-109c9de72737-00-2e87akalqv5ld.spock.replit.dev"
+  "https://a621d81c-110b-47d4-a0a0-109c9de72737-00-2e87akalqv5ld.spock.replit.dev";
 const viacep =
-  "https://feb2862c-c88d-43fa-8c57-baca91a6c4c5-00-aheq4dqze7hl.picard.replit.dev/"
+  "https://feb2862c-c88d-43fa-8c57-baca91a6c4c5-00-aheq4dqze7hl.picard.replit.dev/";
 const CRUD =
-  "https://c43f2d09-4ca1-4257-a8cb-5e6d97411bb8-00-2ir59x0jujtgu.kirk.replit.dev/api/pessoas"
-const urlOpenAI = "https://69a9d945-11ca-4394-a519-7873177de5ff-00-25jvbrl87p7y1.janeway.replit.dev:3000"
+  "https://c43f2d09-4ca1-4257-a8cb-5e6d97411bb8-00-2ir59x0jujtgu.kirk.replit.dev/api/pessoas";
+const urlOpenAI =
+  "https://69a9d945-11ca-4394-a519-7873177de5ff-00-25jvbrl87p7y1.janeway.replit.dev:3000";
 
 app.use(express.urlencoded({ extended: true }));
 
@@ -96,7 +97,7 @@ io.on("connection", (socket) => {
         .then((res) => res.text())
         .then((text) => {
           try {
-            const data = JSON.parse(text); 
+            const data = JSON.parse(text);
             if (data && data.logradouro) {
               const endereco = `${data.logradouro}, ${data.bairro}, ${data.localidade} - ${data.uf}`;
               io.emit("message", `${users[socket.id]}: ${endereco}`);
@@ -117,8 +118,8 @@ io.on("connection", (socket) => {
       const parts = msg.slice(4).trim().split(" ");
       if (parts.length >= 3) {
         const uf = parts[0];
-        const cidade = parts.slice(1, parts.length - 1).join(" "); 
-        const rua = parts[parts.length - 1]; 
+        const cidade = parts.slice(1, parts.length - 1).join(" ");
+        const rua = parts[parts.length - 1];
         fetch(
           `${viacep}/rua/${uf}/${encodeURIComponent(cidade)}/${encodeURIComponent(rua)}`,
         )
@@ -275,35 +276,37 @@ io.on("connection", (socket) => {
           );
         });
     } else if (lowerMsg.startsWith("dalle ")) {
-        const prompt = msg.slice(6).trim();
-        console.log("prompt: " + prompt);
-        fetch(`${urlOpenAI}/gptImage`, {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ prompt }),
+      const prompt = msg.slice(6).trim();
+      console.log("prompt: " + prompt);
+      fetch(`${urlOpenAI}/gptImage`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ prompt }),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          io.emit(
+            "message",
+            `${users[socket.id]}: <img src="${data.imageUrl}" width="300" height="300">`,
+          );
         })
-          .then((res) => res.json())
-          .then((data) => {
-            console.log("data: ", data);
-            
-            io.emit("message", `${users[socket.id]}: <img src="${data.imageUrl}" width="300" height="300">`);
-          })
-          .catch((error) => {
-            console.error("Erro ao comunicar com a API de ChatGPT:", error);
-            io.emit(
-              "message",
-              `${users[socket.id]}: Erro ao comunicar com a API de ChatGPT.`
-            );
-          });
-          
-
-    }
-    else {
+        .catch((error) => {
+          console.error("Erro ao comunicar com a API de ChatGPT:", error);
+          io.emit(
+            "message",
+            `${users[socket.id]}: Erro ao comunicar com a API de ChatGPT.`,
+          );
+        });
+    } else if (lowerMsg.startsWith("/help")) {
+      io.emit(
+        "message",
+        ` <p> /cep cep, /rua uf cidade rua, /get pessoas, /get pessoa id, /post pessoa nome, idade, cpf, email, sexo, /patch pessoa id, nome, idade, cpf, email, sexo, /delete pessoa id, /chatgpt prompt, /dalle prompt </p>`,
+      );
+    } else {
       io.emit("message", `${users[socket.id]}: Comando não reconhecido.`);
-    } 
-    
+    }
   });
 });
 
