@@ -15,5 +15,5 @@
 
 # ENTREGAS DO CHAT SEMANA 3
 - Integre o chat com a API de chat da OPENAI API do ChatGPT. Para isso você ou sua equipe devem comprar 20 reais de créditos para usar os tokens da api. Uso o link abaixo para acessar as referências de uso. - OK
--  Use o recurso (endpoint) de geração de imagem.  Exemplo, ao digitar no chat "gere uma imagem de gato" (esse prompt irá gerar uma imagem e retornar para você uma URL para ser adicionada em um src de um img. Use o link abaixo para acessar as referência de uso.
+-  Use o recurso (endpoint) de geração de imagem.  Exemplo, ao digitar no chat "gere uma imagem de gato" (esse prompt irá gerar uma imagem e retornar para você uma URL para ser adicionada em um src de um img. Use o link abaixo para acessar as referência de uso. - OK
 -  Use o de completion para criar o chat conversacional do CHATGPT. Use os links abaixo para acessar as referência de uso. - OK
