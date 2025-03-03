@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start-wbs": "nodemon ./websocket/chat-websocket.js",
-    "start-sktio": "nodemon ./socketio/chat-socketio.js"
+    "wbs": "nodemon ./websocket/chat-websocket.js",
+    "io": "nodemon ./socketio/chat-socketio.js"
   },
   "keywords": [],
   "author": "",
@@ -13,6 +13,7 @@
   "dependencies": {
     "@types/node": "^18.0.6",
     "express": "^4.19.2",
+    "express-session": "^1.18.0",
     "nodemon": "^3.1.0",
     "socket.io": "^4.7.5",
     "ws": "^8.17.0"
